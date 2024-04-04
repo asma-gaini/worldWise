@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 
 import styles from "./Map.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
 
 function Map() {
@@ -18,12 +18,20 @@ function Map() {
   const mapLat = searchParams.get("lat");
   const mapLng = searchParams.get("lng");
 
+  // vaghti az city back mizanim position map barmigarde ru default
+  // mamikhaym vaghti back zadim map ru position hamon shahr bemine pas omadim hamgam sazi kardim ba position url
+  useEffect(
+    function () {
+      if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
+    },
+    [mapLat, mapLng]
+  );
+
   return (
     // <div className={styles.mapContainer} onClick={() => navigate("form")}>
     <div className={styles.mapContainer}>
       <MapContainer
         center={mapPosition}
-        // center={[mapLat, mapLng]}
         zoom={6}
         scrollWheelZoom={true}
         className={styles.map}
@@ -44,7 +52,7 @@ function Map() {
         ))}
 
         {/* vaghti aghab ru mizanim dg on position ru nadarim pas in null mishe va dg nemikhone pa miyam ye pishfarz besh midim 40,0 */}
-        <ChangeCenter position={[mapLat || 40, mapLng || 0]} />
+        <ChangeCenter position={mapPosition} />
       </MapContainer>
     </div>
   );
