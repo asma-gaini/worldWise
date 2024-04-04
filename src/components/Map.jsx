@@ -1,5 +1,12 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvent,
+} from "react-leaflet";
 
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
@@ -53,6 +60,7 @@ function Map() {
 
         {/* vaghti aghab ru mizanim dg on position ru nadarim pas in null mishe va dg nemikhone pa miyam ye pishfarz besh midim 40,0 */}
         <ChangeCenter position={mapPosition} />
+        <DetectedClick />
       </MapContainer>
     </div>
   );
@@ -64,4 +72,14 @@ function ChangeCenter({ position }) {
   return null;
 }
 
+// chon mostaghim nemitunim on click ru bara inke harja map click shod form ru baz kone gharar bedim
+// miyaym mese changeCenter khodemon dorostesh mikonim  ba estefade az degar library haye leafletmese mapevent
+function DetectedClick() {
+  const navigate = useNavigate();
+
+  useMapEvent({
+    // noe event ru migire va dar on ye callback function migore
+    click: (e) => navigate("form"),
+  });
+}
 export default Map;
