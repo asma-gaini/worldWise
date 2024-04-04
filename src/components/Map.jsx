@@ -11,6 +11,8 @@ import {
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
+import { UseGeoLocate } from "../hooks/useGeolocation";
+import Button from "./Button";
 
 function Map() {
   //bara inke bdon inke link dashte bashim betunim ye seri etelaat b url befrestim
@@ -18,9 +20,17 @@ function Map() {
 
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
-
   //khondane query ha mese state e taghribn e avalie dare ye tabe bara b roz resani
   const [searchParams, setSearchParams] = useSearchParams();
+
+  //hook sefareshi gablan khodemon tu use-geolocation project k inja estefade darim mikonim
+  const {
+    isLoading: isLoadingPosition,
+    postion: geolocationPostion,
+    getPosition,
+  } = UseGeoLocate();
+  console.log(UseGeoLocate);
+
   //bara gereftan har kodom az query ha bayad az methode get estefade konim o tu moteghayer zakhire konim
   const mapLat = searchParams.get("lat");
   const mapLng = searchParams.get("lng");
@@ -34,9 +44,20 @@ function Map() {
     [mapLat, mapLng]
   );
 
+  useEffect(
+    function () {
+      if (geolocationPostion)
+        setMapPosition([geolocationPostion.lat, geolocationPostion.lng]);
+    },
+    [geolocationPostion]
+  );
+
   return (
     // <div className={styles.mapContainer} onClick={() => navigate("form")}>
     <div className={styles.mapContainer}>
+      <Button type="position" onClick={getPosition}>
+        {isLoadingPosition ? "Loading..." : "use your position"}
+      </Button>
       <MapContainer
         center={mapPosition}
         zoom={6}
@@ -79,7 +100,10 @@ function DetectedClick() {
 
   useMapEvent({
     // noe event ru migire va dar on ye callback function migore
-    click: (e) => navigate("form"),
+    click: (e) => navigate(`form?lat=${e.latlng.lat}&lng=${e.latlng.lng}`),
+    //vaghti az event console.lag begirim mibinim k bad click ru map tu latlng ye position mide
+    //mamiyaym in position ru b onvan query  dar url migirim ta az khondanesh az url dar form estefade konim
+    //k vaghti click mishe dar form on position ru bezanim
   });
 }
 export default Map;
