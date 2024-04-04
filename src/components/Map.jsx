@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 
 import styles from "./Map.module.css";
 import { useState } from "react";
@@ -15,14 +15,16 @@ function Map() {
   //khondane query ha mese state e taghribn e avalie dare ye tabe bara b roz resani
   const [searchParams, setSearchParams] = useSearchParams();
   //bara gereftan har kodom az query ha bayad az methode get estefade konim o tu moteghayer zakhire konim
-  const lat = searchParams.get("lat");
-  const lng = searchParams.get("lng");
+  const mapLat = searchParams.get("lat");
+  const mapLng = searchParams.get("lng");
 
   return (
-    <div className={styles.mapContainer} onClick={() => navigate("form")}>
+    // <div className={styles.mapContainer} onClick={() => navigate("form")}>
+    <div className={styles.mapContainer}>
       <MapContainer
         center={mapPosition}
-        zoom={13}
+        // center={[mapLat, mapLng]}
+        zoom={6}
         scrollWheelZoom={true}
         className={styles.map}
       >
@@ -40,9 +42,18 @@ function Map() {
             </Popup>
           </Marker>
         ))}
+
+        {/* vaghti aghab ru mizanim dg on position ru nadarim pas in null mishe va dg nemikhone pa miyam ye pishfarz besh midim 40,0 */}
+        <ChangeCenter position={[mapLat || 40, mapLng || 0]} />
       </MapContainer>
     </div>
   );
+}
+
+function ChangeCenter({ position }) {
+  const map = useMap();
+  map.setView(position);
+  return null;
 }
 
 export default Map;
