@@ -29,7 +29,6 @@ function Map() {
     postion: geolocationPostion,
     getPosition,
   } = UseGeoLocate();
-  console.log(UseGeoLocate);
 
   //bara gereftan har kodom az query ha bayad az methode get estefade konim o tu moteghayer zakhire konim
   const mapLat = searchParams.get("lat");
@@ -55,9 +54,11 @@ function Map() {
   return (
     // <div className={styles.mapContainer} onClick={() => navigate("form")}>
     <div className={styles.mapContainer}>
-      <Button type="position" onClick={getPosition}>
-        {isLoadingPosition ? "Loading..." : "use your position"}
-      </Button>
+      {!geolocationPostion && (
+        <Button type="position" onClick={getPosition}>
+          {isLoadingPosition ? "Loading..." : "use your position"}
+        </Button>
+      )}
       <MapContainer
         center={mapPosition}
         zoom={6}
