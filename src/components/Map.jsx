@@ -26,7 +26,7 @@ function Map() {
   //hook sefareshi gablan khodemon tu use-geolocation project k inja estefade darim mikonim
   const {
     isLoading: isLoadingPosition,
-    postion: geolocationPostion,
+    position: geolocationPosition,
     getPosition,
   } = UseGeoLocate();
 
@@ -45,16 +45,16 @@ function Map() {
 
   useEffect(
     function () {
-      if (geolocationPostion)
-        setMapPosition([geolocationPostion.lat, geolocationPostion.lng]);
+      if (geolocationPosition)
+        setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
     },
-    [geolocationPostion]
+    [geolocationPosition]
   );
 
   return (
     // <div className={styles.mapContainer} onClick={() => navigate("form")}>
     <div className={styles.mapContainer}>
-      {!geolocationPostion && (
+      {!geolocationPosition && (
         <Button type="position" onClick={getPosition}>
           {isLoadingPosition ? "Loading..." : "use your position"}
         </Button>
