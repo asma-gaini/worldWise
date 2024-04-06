@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
 import { UseGeoLocate } from "../hooks/useGeolocation";
 import Button from "./Button";
+import { useUrlPosition } from "../hooks/useUrlPosition";
 
 function Map() {
   //bara inke bdon inke link dashte bashim betunim ye seri etelaat b url befrestim
@@ -20,8 +21,6 @@ function Map() {
 
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
-  //khondane query ha mese state e taghribn e avalie dare ye tabe bara b roz resani
-  const [searchParams, setSearchParams] = useSearchParams();
 
   //hook sefareshi gablan khodemon tu use-geolocation project k inja estefade darim mikonim
   const {
@@ -30,9 +29,7 @@ function Map() {
     getPosition,
   } = UseGeoLocate();
 
-  //bara gereftan har kodom az query ha bayad az methode get estefade konim o tu moteghayer zakhire konim
-  const mapLat = searchParams.get("lat");
-  const mapLng = searchParams.get("lng");
+  const [mapLat, mapLng] = useUrlPosition();
 
   // vaghti az city back mizanim position map barmigarde ru default
   // mamikhaym vaghti back zadim map ru position hamon shahr bemine pas omadim hamgam sazi kardim ba position url
