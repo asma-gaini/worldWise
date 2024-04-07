@@ -1,27 +1,74 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 
 const BASE_URL = "http://localhost:9000";
 
 const CitiesContext = createContext();
 
-function CitiesProvider({ children }) {
-  const [cities, setCities] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+const initialState = {
+  cities: [],
+  isLoading: false,
+  currentCity: {},
+  error: "",
+};
+function reducer(state, action) {
+  switch (action.type) {
+    case "loading":
+      return { ...state, isLoading: true };
 
-  //bara fetch dobare az data bara details city
-  const [currentCity, setCurrentCity] = useState({});
+    case "cities/loaded":
+      return { ...state, isLoading: false, cities: action.payload };
+
+    case "city/loaded":
+      return { ...state, isLoading: false, currentCity: action.payload };
+
+    case "city/created":
+      return {
+        ...state,
+        isLoading: false,
+        cities: [...state.cities, action.payload],
+        currentCity: action.payload,
+      };
+
+    case "city/deleted":
+      return {
+        ...state,
+        isLoading: false,
+        cities: state.cities.filter((city) => city.id !== action.payload),
+        currentCity: {},
+      };
+
+    case "rejected":
+      return { ...state, isLoading: false, error: action.payload };
+
+    default:
+      throw new Error("Unkonown action type");
+  }
+}
+
+function CitiesProvider({ children }) {
+  const [{ cities, isLoading, currentCity, error }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   useEffect(function () {
     async function fetchCities() {
+      dispatch({ type: "loading" });
       try {
-        setIsLoading(true);
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
-        setCities(data);
+        dispatch({ type: "cities/loaded", payload: data });
       } catch {
-        alert("There was an error loading data...");
-      } finally {
-        setIsLoading(false);
+        dispatch({
+          type: "rejected",
+          payload: "There was an error loading cities...",
+        });
       }
     }
     fetchCities();
@@ -29,50 +76,59 @@ function CitiesProvider({ children }) {
 
   //fetch  detail city hastesh k tu khode city tu  effect  estefade mishe
   async function getCity(id) {
+    //check kone k id k migirim tu hamon shahre ya na--yani vaghti 2 bar poshte ham ye shahr ru mizanim dg api darkhast nade
+    // bayad b adad tabdil beshe chon chizi k az url khonde mishe stringe
+    if (Number(id) === currentCity.id) return;
+
+    dispatch({ type: "loading" });
+
     try {
-      setIsLoading(true);
       const res = await fetch(`${BASE_URL}/cities/${id}`);
       const data = await res.json();
-      setCurrentCity(data);
+      dispatch({ type: "city/loaded", payload: data });
     } catch {
-      alert("There was an error loading data...");
-    } finally {
-      setIsLoading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error loading the city...",
+      });
     }
   }
 
   // bara ersal etelat b api va rabti b react nadare on newcity k az ru form migirim ru mikhaym add konim b datamon
   // chon marbot b api hast miyam tu contaxt minevisim ba bad pass midim
   async function createCity(newCity) {
+    dispatch({ type: "loading" });
+
     try {
-      setIsLoading(true);
       const res = await fetch(`${BASE_URL}/cities`, {
         method: "POST",
         body: JSON.stringify(newCity),
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      setCities((cities) => [...cities, data]);
+      dispatch({ type: "city/created", payload: data });
     } catch {
-      alert("There was an error create city...");
-    } finally {
-      setIsLoading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error creating the city...",
+      });
     }
   }
 
   // chon k dobare bara hazfe ye city bayad az api ham hazf konim miyaym tu citiescontext minevisimesh
   async function deleteCity(id) {
+    dispatch({ type: "loading" });
+
     try {
-      setIsLoading(true);
       await fetch(`${BASE_URL}/cities/${id}`, {
         method: "DELETE",
       });
-
-      setCities((cities) => cities.filter((city) => city.id !== id));
+      dispatch({ type: "city/deleted", payload: id });
     } catch {
-      alert("There was an error dileting city...");
-    } finally {
-      setIsLoading(false);
+      dispatch({
+        type: "rejected",
+        payload: "There was an error dileting the city...",
+      });
     }
   }
 
@@ -82,6 +138,7 @@ function CitiesProvider({ children }) {
         cities,
         isLoading,
         currentCity,
+        error,
         getCity,
         createCity,
         deleteCity,
