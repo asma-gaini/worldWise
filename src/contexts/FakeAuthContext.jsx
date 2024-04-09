@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { createContext, useContext, useReducer } from "react";
 
 const AuthContext = createContext();
 
@@ -24,7 +24,7 @@ const FAKE_USER = {
 function AuthProvider({ children }) {
   const [{ user, isAthenticated }, dispatch] = useReducer(
     reducer,
-    initialstate
+    initialState
   );
 
   //dar asl va vagheiyat inja ma b api darkhast midim va onja etebar sanji mishe vali aln faghat ba ye data fake
@@ -48,6 +48,6 @@ function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined)
     throw new Error("AuthContext was used outside of the AuthProvider");
-  //   return context;
+  return context;
 }
 export { AuthProvider, useAuth };
