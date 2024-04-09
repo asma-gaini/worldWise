@@ -3,15 +3,12 @@ import { useAuth } from "../contexts/FakeAuthContext";
 import styles from "./User.module.css";
 
 function User() {
-  const { user } = useAuth();
-  // const navigate = useNavigate();
-
-  // const { isAthenticated, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   function handleClick(e) {
-    // e.preventDefault();
-    // logout();
-    // navigate("/");
+    logout();
+    navigate("/");
   }
   return (
     <div className={styles.user}>
