@@ -13,6 +13,7 @@ import City from "./components/City";
 import Form from "./components/Form";
 import { CitiesProvider, useCities } from "./contexts/CitiesContext";
 import { AuthProvider, useAuth } from "./contexts/FakeAuthContext";
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 function App() {
   return (
@@ -26,7 +27,15 @@ function App() {
             <Route path="product" element={<Product />} />
             <Route path="price" element={<Pricing />} />
             <Route path="login" element={<Login />} />
-            <Route path="app" element={<AppLayout />}>
+            <Route
+              path="app"
+              element={
+                //injor hame masir ha va app layout ru darbar dare va age authenticate nabood mire homePage
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Navigate replace to="cities" />} />
               {/* masir pishfarz yani masir app k baz mishe ru cities hast  */}
               {/* omadim az navigate estefade kardim ta vaghti bar aval miad ru cities tu url va cties btn ham faal bakhshe
