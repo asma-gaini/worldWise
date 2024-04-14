@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   createContext,
   useContext,
@@ -74,25 +75,29 @@ function CitiesProvider({ children }) {
     fetchCities();
   }, []);
 
+  //******bekhatere effect tu araye vabastegi tu city.jsx hey miyad render mishe o tu loop benahayat miofte  pass az use call back bara memo estefade mikonim
   //fetch  detail city hastesh k tu khode city tu  effect  estefade mishe
-  async function getCity(id) {
-    //check kone k id k migirim tu hamon shahre ya na--yani vaghti 2 bar poshte ham ye shahr ru mizanim dg api darkhast nade
-    // bayad b adad tabdil beshe chon chizi k az url khonde mishe stringe
-    if (Number(id) === currentCity.id) return;
+  const getCity = useCallback(
+    async function getCity(id) {
+      //check kone k id k migirim tu hamon shahre ya na--yani vaghti 2 bar poshte ham ye shahr ru mizanim dg api darkhast nade
+      // bayad b adad tabdil beshe chon chizi k az url khonde mishe stringe
+      if (Number(id) === currentCity.id) return;
 
-    dispatch({ type: "loading" });
+      dispatch({ type: "loading" });
 
-    try {
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
-      const data = await res.json();
-      dispatch({ type: "city/loaded", payload: data });
-    } catch {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error loading the city...",
-      });
-    }
-  }
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+        const data = await res.json();
+        dispatch({ type: "city/loaded", payload: data });
+      } catch {
+        dispatch({
+          type: "rejected",
+          payload: "There was an error loading the city...",
+        });
+      }
+    },
+    [currentCity.id]
+  );
 
   // bara ersal etelat b api va rabti b react nadare on newcity k az ru form migirim ru mikhaym add konim b datamon
   // chon marbot b api hast miyam tu contaxt minevisim ba bad pass midim
